@@ -143,6 +143,7 @@
             this.btnEdit.TabIndex = 8;
             this.btnEdit.Text = "Edit";
             this.btnEdit.UseVisualStyleBackColor = true;
+            this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
             // 
             // btnSearchById
             // 
@@ -162,6 +163,7 @@
             this.btnSearchByName.TabIndex = 10;
             this.btnSearchByName.Text = "Search Name";
             this.btnSearchByName.UseVisualStyleBackColor = true;
+            this.btnSearchByName.Click += new System.EventHandler(this.btnSearchByName_Click);
             // 
             // btnDelete
             // 
@@ -171,6 +173,7 @@
             this.btnDelete.TabIndex = 12;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // btnDeleteAll
             // 
@@ -180,6 +183,7 @@
             this.btnDeleteAll.TabIndex = 13;
             this.btnDeleteAll.Text = "Delete All";
             this.btnDeleteAll.UseVisualStyleBackColor = true;
+            this.btnDeleteAll.Click += new System.EventHandler(this.btnDeleteAll_Click);
             // 
             // rtxtOutput
             // 

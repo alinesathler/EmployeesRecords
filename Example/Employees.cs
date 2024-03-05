@@ -15,7 +15,8 @@ using System.Xml.Linq;
 //Purpose: C# Windows Form for employees' record
 //Revision History:
 //REV00 - 2024/03/03 - Initial version
-//REV01 - 2024/03/05 - Adding text file and functions search by id and view all records  
+//REV01 - 2024/03/04 - Adding text file and methods search by id and view all records 
+//REV02 - 2024/03/04 - Methods search by name, delete, delete all and edit  
 
 namespace Example {
     public partial class Employees : Form {
@@ -42,7 +43,7 @@ namespace Example {
 
         //Check if inputs are valid.
         private bool ValidateInputs(int employeeId, bool isEmployeeId, string firstName, string lastName, DateTime dateOfBirth, string phone, double salary, bool isSalary) {
-            bool isFirstName = true;
+            bool isFirstName = false;
 
             bool isLastName = true;
 
@@ -55,21 +56,11 @@ namespace Example {
             //Validate id.
             ValidateId(employeeId, ref isEmployeeId);
 
-            //Change backgroud color and display error message for employee first name input.
-            if (string.IsNullOrEmpty(firstName)) {
-                txtFirstName.BackColor = Color.LightPink;
-                error += "Please enter a valid first name.\n";
+            //Validade first name.
+            ValidateName(firstName, ref isFirstName, txtFirstName, "first");
 
-                isFirstName = false;
-            }
-
-            //Change backgroud color and display error message for employee last name input.
-            if (string.IsNullOrEmpty(lastName)) {
-                txtLastName.BackColor = Color.LightPink;
-                error += "Please enter a valid last name.\n";
-
-                isLastName = false;
-            }
+            //Validade last name.
+            ValidateName(lastName, ref isLastName, txtLastName, "last");
 
             //Change backgroud color and display error message for date of birth input.
             if (dateOfBirth > DateTime.Now) {
@@ -114,6 +105,17 @@ namespace Example {
             }
         }
 
+        //Check if name is valid.
+        private void ValidateName(string name, ref bool isName, TextBox txtName, string label) {
+            //Change backgroud color and display error message for employee first/last name input.
+            if (string.IsNullOrEmpty(name)) {
+                txtName.BackColor = Color.LightPink;
+                error += $"Please enter a valid {label} name.\n";
+            } else {
+                isName = true;
+            }
+        }
+
         //Clean error message and background colors for the default.
         private void ChangeToInitialState() {
             //Clear error and status messages.
@@ -142,8 +144,6 @@ namespace Example {
         }
 
         private void btnAdd_Click(object sender, EventArgs e) {
-            ChangeToInitialState();
-
             //Read inputs.
             bool isEmployeeId = int.TryParse(txtId.Text, out int employeeId);
             string firstName = txtFirstName.Text;
@@ -151,6 +151,9 @@ namespace Example {
             DateTime dateOfBirth = dtpDateOfBirth.Value.Date;
             string phone = mtxtPhone.Text;
             bool isSalary = double.TryParse(txtSalary.Text, out double salary);
+
+            //Clean errors and status
+            ChangeToInitialState();
 
             //Check if employee id already exists.
             foreach (Employee employee in employeesRecords.Employees) {
@@ -177,20 +180,101 @@ namespace Example {
             }
         }
 
-        private void btnSearchById_Click(object sender, EventArgs e) {
+        private void btnEdit_Click(object sender, EventArgs e) {
+            //Read inputs.
+            bool isEmployeeId = int.TryParse(txtId.Text, out int employeeId);
+            string firstName = txtFirstName.Text;
+            string lastName = txtLastName.Text;
+            DateTime dateOfBirth = dtpDateOfBirth.Value.Date;
+            string phone = mtxtPhone.Text;
+            bool isSalary = double.TryParse(txtSalary.Text, out double salary);
+
+            //Clean errors and status
             ChangeToInitialState();
 
+            if (ValidateInputs(employeeId, isEmployeeId, firstName, lastName, dateOfBirth, phone, salary, isSalary)) {
+                Employee employee = employeesRecords.SearchById(employeeId);
+
+                if (employee.EmployeeId == employeeId) {
+                    //Confirm delete.
+                    if (MessageBox.Show("Are you sure you want to update this employee?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
+                        if (employeesRecords.EditEmployee(employeeId, firstName, lastName, dateOfBirth, phone, salary)) {
+                            tsslStatus.Text = "Employee updated.";
+
+                            ClearInputs();
+                        }
+                    } else {
+                        tsslStatus.Text = "Edit canceled.";
+                    }
+
+                    rtxtOutput.Text = employeesRecords.ToString();
+                } else {
+                    tsslStatus.Text = "Employee not found.";
+                }
+            } else {
+                lblError.Text = error;
+                lblError.Visible = true;
+            }
+        }
+
+        private void btnSearchById_Click(object sender, EventArgs e) {
             //Read id.
             bool isEmployeeId = int.TryParse(txtId.Text, out int employeeId);
+
+            //Clean errors and status
+            ChangeToInitialState();
 
             ValidateId(employeeId, ref isEmployeeId);
 
             if(isEmployeeId) {
-                rtxtOutput.Text = employeesRecords.SearchById(employeeId);
+                Employee employee = employeesRecords.SearchById(employeeId);
 
-                ClearInputs();
+                if (employee.EmployeeId == employeeId) {
+                    rtxtOutput.Text = "Search Results:\n";
+                    rtxtOutput.Text += employee.ToString();
 
-                tsslStatus.Text = "Employee founded.";
+                    ClearInputs();
+
+                    tsslStatus.Text = "Employee found.";
+                } else {
+                    rtxtOutput.Text = "Employee not found.";
+                }
+            } else {
+                lblError.Text = error;
+                lblError.Visible = true;
+            }
+        }
+
+        private void btnSearchByName_Click(object sender, EventArgs e) {
+            //Read fisrt name.
+            string name = txtFirstName.Text;
+            bool isName = false;
+
+            List<Employee> employeesSearch = new List<Employee>();
+
+            //Clean errors and status
+            ChangeToInitialState();
+
+            ValidateName(name, ref isName, txtFirstName, "first/last");
+
+            if (isName) {
+                employeesSearch = employeesRecords.SearchByName(name);
+
+                if (employeesSearch.Count > 0) {
+
+                    rtxtOutput.Text = "Search Results:\n";
+
+                    //Show search result.
+                    foreach (Employee employee in employeesSearch) {
+                        rtxtOutput.Text += employee.ToString();
+                    }
+
+                    ClearInputs();
+
+                    tsslStatus.Text = "Employee(s) founded.";
+                } else {
+                    rtxtOutput.Text = "Employee not found.";
+                }
             } else {
                 lblError.Text = error;
                 lblError.Visible = true;
@@ -204,6 +288,58 @@ namespace Example {
             rtxtOutput.Text = employeesRecords.ToString();
         }
 
+        private void btnDelete_Click(object sender, EventArgs e) {
+            //Read id.
+            bool isEmployeeId = int.TryParse(txtId.Text, out int employeeId);
 
+            //Clean errors and status
+            ChangeToInitialState();
+
+            ValidateId(employeeId, ref isEmployeeId);
+
+            if(isEmployeeId) {
+                Employee employee = employeesRecords.SearchById(employeeId);
+
+                if (employee.EmployeeId == employeeId) {
+                    rtxtOutput.Text = employee.ToString();
+
+                    ClearInputs();
+
+                    //Confirm delete.
+                    if (MessageBox.Show("Are you sure you want to delete this employee?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
+                        if(employeesRecords.Delete(employeeId)) {
+                            tsslStatus.Text = "Employee deleted.";
+                        }
+                    } else {
+                        tsslStatus.Text = "Delete canceled.";
+                    }
+
+                    //Show list of employees
+                    rtxtOutput.Text = employeesRecords.ToString();
+                } else {
+                    tsslStatus.Text = "Employee not found.";
+                }
+            } else {
+                lblError.Text = error;
+                lblError.Visible = true;
+            }
+        }
+
+        private void btnDeleteAll_Click(object sender, EventArgs e) {
+            //Clean errors and status
+            ChangeToInitialState();
+
+            //Confirm delete all.
+            if (MessageBox.Show("Are you sure you want to delete all records?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) {
+                if (employeesRecords.DeleteAll()) {
+                    tsslStatus.Text = "All employees deleted.";
+                }
+            } else {
+                tsslStatus.Text = "Delete all records canceled.";
+            }
+
+            //Show list of employees
+            rtxtOutput.Text = employeesRecords.ToString();
+        }
     }
 }
