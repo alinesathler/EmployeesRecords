@@ -10,15 +10,10 @@ namespace Example {
     //Class with a list of objects Employee with employee id, first name, last name, date of birth, phone and salary.
     internal class EmployeeRecords {
         public List<Employee> Employees { get; private set; }
-        private List<Employee> employeesSearch = new List<Employee>();
 
         private const string Path = @"C:\Demo\EmployeesRecords.txt";
 
         public EmployeeRecords() {
-            this.Employees = new List<Employee>();
-        }
-
-        public EmployeeRecords(Employee employee) {
             this.Employees = new List<Employee>();
         }
 
@@ -78,6 +73,7 @@ namespace Example {
             return true;
         }
 
+        //Override method ToString.
         public override string ToString() {
             string output = "List of Employees:\n";
 
@@ -124,7 +120,7 @@ namespace Example {
             return true;
         }
 
-        //Delete all Employees list
+        //Delete all employess in the Employees list
         public bool DeleteAll() {
             Employees.Clear();
 

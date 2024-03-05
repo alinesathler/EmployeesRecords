@@ -106,6 +106,7 @@ namespace Example {
             this.Salary = salary;
         }
 
+        //Override method ToString.
         public override string ToString() {
             return $"Id: {EmployeeId}, Name: {FirstName} {LastName}, Date of Birth: {DateOfBirth.ToString("MM/dd/yyyy")}, Phone: {Phone}, Salary: {Salary.ToString("C2")}\n";
         }
