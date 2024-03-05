@@ -15,7 +15,7 @@ using System.Xml.Linq;
 //Purpose: C# Windows Form for employees' record
 //Revision History:
 //REV00 - 2024/03/03 - Initial version
-//REV01 - 2024/03/05 - Adding text file and functions search by id and view all records 
+//REV01 - 2024/03/05 - Adding text file and functions search by id and view all records  
 
 namespace Example {
     public partial class Employees : Form {
