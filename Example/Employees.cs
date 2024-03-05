@@ -16,7 +16,7 @@ using System.Xml.Linq;
 //Revision History:
 //REV00 - 2024/03/03 - Initial version
 //REV01 - 2024/03/04 - Adding text file and methods search by id and view all records 
-//REV02 - 2024/03/04 - Methods search by name, delete, delete all and edit  
+//REV02 - 2024/03/05 - Methods search by name, delete, delete all and edit  
 
 namespace Example {
     public partial class Employees : Form {
